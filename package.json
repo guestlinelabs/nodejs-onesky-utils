@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/brainly/nodejs-onesky-utils.git"
+    "url": "git+https://github.com/guestlinelabs/nodejs-onesky-utils.git"
   },
   "author": "Brainly Sp. z o.o. - (http://www.brainly.co)",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/brainly/nodejs-onesky-utils/issues"
+    "url": "https://github.com/guestlinelabs/nodejs-onesky-utils/issues"
   },
-  "homepage": "https://github.com/brainly/nodejs-onesky-utils",
+  "homepage": "https://github.com/guestlinelabs/nodejs-onesky-utils",
   "dependencies": {
     "md5": "^2.0.0",
     "request": "^2.88.0",
