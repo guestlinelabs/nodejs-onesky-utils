@@ -1,6 +1,6 @@
 {
-  "name": "@brainly/onesky-utils",
-  "version": "1.4.1",
+  "name": "@guestlinelabs/onesky-utils",
+  "version": "1.4.2",
   "description": "Node.js utils for working with OneSky translation service.",
   "main": "index.js",
   "scripts": {
