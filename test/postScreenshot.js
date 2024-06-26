@@ -1,112 +1,109 @@
-/* eslint-env mocha */
-'use strict';
-
-function rootRequire (name) {
-  return require(__dirname + '/../' + name);
+function rootRequire(name) {
+  return require(`${__dirname}/../${name}`);
 }
 
-var mockery = require('mockery');
-var chai = require('chai');
-var expect = chai.expect;
-var sinon = require('sinon');
-var sinonChai = require('sinon-chai');
-var requestPromise;
-var oneskyUtils;
-var defaultOptions;
+const chai = require("chai");
+const expect = chai.expect;
+const sinon = require("sinon");
+const sinonChai = require("sinon-chai");
+let requestPromise;
+let oneskyUtils;
+let defaultOptions;
 
 chai.use(sinonChai);
 
-describe('POST screenshots', function () {
-  afterEach(function () {
-    mockery.deregisterSubstitute('request-promise');
-    mockery.disable();
+const originalFetch = globalThis.fetch;
+
+describe("POST screenshots", () => {
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
   });
 
-  beforeEach(function () {
+  beforeEach(() => {
     defaultOptions = {
-      projectId: 'projectId',
-      secret: 'secret',
-      apiKey: 'apiKey',
-      name: 'name',
-      image: 'image',
+      projectId: "projectId",
+      secret: "secret",
+      apiKey: "apiKey",
+      name: "name",
+      image: "image",
       tags: [
         {
-          key: 'key',
+          key: "key",
           x: 1,
           y: 2,
           width: 3,
           height: 4,
-          file: 'file'
-        }
-      ]
+          file: "file",
+        },
+      ],
     };
-    mockery.registerMock('request-promise', function (request) {
+    globalThis.fetch = async (url, request) => {
       // Assert well formed request
-      expect(request.method).to.equal('POST');
-      expect(request.form.secret).to.be.undefined;
-      expect(request.form.api_key).to.equal('apiKey');
-      expect(request.form.dev_hash).to.not.be.undefined;
-      expect(request.form.timestamp).to.not.be.undefined;
+      expect(request.method).to.equal("POST");
+      expect(request.body.get("secret")).to.be.null;
+      expect(request.body.get("api_key")).to.equal("apiKey");
+      expect(request.body.get("dev_hash")).to.not.be.undefined;
+      expect(request.body.get("timestamp")).to.not.be.undefined;
 
-      var screenshot = request.form.screenshots[0];
-      expect(request.form.screenshots).to.not.be.undefined;
+      const screenshot = JSON.parse(request.body.get("screenshots"))[0];
+      expect(request.body.get("screenshots")).to.not.be.undefined;
 
-      expect(screenshot.name).to.equal('name');
-      expect(screenshot.image).to.equal('image');
-      expect(screenshot.tags[0].key).to.equal('key');
+      expect(screenshot.name).to.equal("name");
+      expect(screenshot.image).to.equal("image");
+      expect(screenshot.tags[0].key).to.equal("key");
       expect(screenshot.tags[0].x).to.equal(1);
       expect(screenshot.tags[0].y).to.equal(2);
       expect(screenshot.tags[0].width).to.equal(3);
       expect(screenshot.tags[0].height).to.equal(4);
-      expect(screenshot.tags[0].file).to.equal('file');
+      expect(screenshot.tags[0].file).to.equal("file");
 
-      return requestPromise;
-    });
-    mockery.enable({
-      warnOnReplace: false,
-      warnOnUnregistered: false,
-      useCleanCache: true
-    });
+      try {
+        await requestPromise;
+        return {
+          json: () => requestPromise,
+        };
+      } catch {
+        let errValue;
+        await requestPromise.catch((err) => {
+          errValue = err;
+        });
+        throw {
+          json: async () => JSON.parse(errValue),
+        };
+      }
+    };
 
-    oneskyUtils = rootRequire('index.js');
+    oneskyUtils = rootRequire("index.js");
   });
 
-  it('Return error request fails with 400', function () {
-    requestPromise = new Promise(function (resolve, reject) {
-      reject({
-        response: {
-          body: "{ message: 'Unable to upload document', code: 400 }"
-        }
-      });
+  it("Return error request fails with 400", () => {
+    requestPromise = new Promise((resolve, reject) => {
+      reject('{ "message": "Unable to upload document", "code": 400 }');
     });
 
     oneskyUtils
       .postScreenshot(defaultOptions)
-      .then(function (data) {
+      .then((data) => {
         expect(data).to.be.undefined;
       })
-      .catch(function (error) {
+      .catch((error) => {
         expect(error.code).to.equal(400);
-        expect(error.message).to.equal('Unable to upload document');
+        expect(error.message).to.equal("Unable to upload document");
       });
   });
 
-  it('Return success on valid content', function (done) {
-    var successCallback = sinon.spy();
-    var errorCallback = sinon.spy();
+  it("Return success on valid content", (done) => {
+    const successCallback = sinon.spy();
+    const errorCallback = sinon.spy();
 
-    requestPromise = new Promise(function (resolve, reject) {
-      resolve({
-        response: {
-          body: '{"meta":{"status":201},"data":{}}'
-        }
-      });
+    requestPromise = new Promise((resolve, reject) => {
+      resolve('{"meta":{"status":201},"data":{}}');
     });
 
     oneskyUtils
       .postScreenshot(defaultOptions)
       .then(successCallback, errorCallback)
-      .then(function () {
+      .then(() => {
         expect(errorCallback).to.not.have.been.calledOnce;
         expect(successCallback).to.have.been.calledOnce;
       })

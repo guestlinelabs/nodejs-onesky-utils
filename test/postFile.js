@@ -1,86 +1,85 @@
-/* eslint-env mocha */
-'use strict';
-
-function rootRequire (name) {
-  return require(__dirname + '/../' + name);
+function rootRequire(name) {
+  return require(`${__dirname}/../${name}`);
 }
 
-var mockery = require('mockery');
-var chai = require('chai');
-var expect = chai.expect;
-var sinon = require('sinon');
-var sinonChai = require('sinon-chai');
-var requestPromise;
-var oneskyUtils;
-var defaultOptions;
+const chai = require("chai");
+const expect = chai.expect;
+const sinon = require("sinon");
+const sinonChai = require("sinon-chai");
+let requestPromise;
+let oneskyUtils;
+let defaultOptions;
+
+const originalFetch = globalThis.fetch;
 
 chai.use(sinonChai);
-describe('POST translations with wrong credentials', function () {
-  before(function () {
-    mockery.registerMock('request-promise', function () {
-      return requestPromise;
-    });
-    mockery.enable({
-      warnOnReplace: false,
-      warnOnUnregistered: false,
-      useCleanCache: true
-    });
+describe("POST translations with wrong credentials", () => {
+  before(() => {
+    globalThis.fetch = async () => {
+      try {
+        await requestPromise;
+        return {
+          json: () => requestPromise,
+        };
+      } catch {
+        let errValue;
+        await requestPromise.catch((err) => {
+          errValue = err;
+        });
+        throw {
+          json: async () => JSON.parse(errValue),
+        };
+      }
+    };
 
-    oneskyUtils = rootRequire('index.js');
+    oneskyUtils = rootRequire("index.js");
   });
 
-  after(function () {
-    mockery.deregisterSubstitute('request-promise');
-    mockery.disable();
+  after(() => {
+    globalThis.fetch = originalFetch;
   });
 
-  beforeEach(function () {
+  beforeEach(() => {
     defaultOptions = {
-      language: 'pl',
-      projectId: 'projectId',
-      secret: 'secret',
-      apiKey: 'apiKey',
-      format: 'HIERARCHICAL_JSON',
-      fileName: 'app-translation.json',
-      content: JSON.stringify({toTranslate: 'Hey there'}),
-      keepStrings: false
+      language: "pl",
+      projectId: "projectId",
+      secret: "secret",
+      apiKey: "apiKey",
+      format: "HIERARCHICAL_JSON",
+      fileName: "app-translation.json",
+      content: JSON.stringify({ toTranslate: "Hey there" }),
+      keepStrings: false,
     };
   });
 
-  it('Return error request fails with 400', function () {
-    requestPromise = new Promise(function (resolve, reject) {
-      reject({
-        response: {
-          body: '{ message: \'Unable to upload document\', code: 400 }'
-        }
-      });
+  it("Return error request fails with 400", () => {
+    requestPromise = new Promise((resolve, reject) => {
+      reject('{ "message": "Unable to upload document", "code": 400 }');
     });
 
-    oneskyUtils.postFile(defaultOptions)
-      .then(function (data) {
+    oneskyUtils
+      .postFile(defaultOptions)
+      .then((data) => {
         expect(data).to.be.undefined;
       })
-      .catch(function (error) {
+      .catch((error) => {
         expect(error.code).to.equal(400);
-        expect(error.message).to.equal('Unable to upload document');
+        expect(error.message).to.equal("Unable to upload document");
       });
   });
 
-  it('Return success on valid content', function (done) {
-    var successCallback = sinon.spy();
-    var errorCallback = sinon.spy();
+  it("Return success on valid content", (done) => {
+    const successCallback = sinon.spy();
+    const errorCallback = sinon.spy();
 
-    requestPromise = new Promise(function (resolve, reject) {
-      resolve({
-        response: {
-          body: '{"meta":{"status":201},"data":{}}'
-        }
-      });
+    requestPromise = new Promise((resolve, reject) => {
+      resolve('{"meta":{"status":201},"data":{}}');
     });
 
-    oneskyUtils.postFile(defaultOptions)
+    oneskyUtils
+      .postFile(defaultOptions)
       .then(successCallback, errorCallback)
-      .then(function () {
+      .then(() => {
         expect(errorCallback).to.not.have.been.calledOnce;
         expect(successCallback).to.have.been.calledOnce;
       })

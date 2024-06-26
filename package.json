@@ -1,32 +1,32 @@
 {
-  "name": "@guestlinelabs/onesky-utils",
-  "version": "1.4.2",
-  "description": "Node.js utils for working with OneSky translation service.",
-  "main": "index.js",
-  "scripts": {
-    "test": "mocha test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/guestlinelabs/nodejs-onesky-utils.git"
-  },
-  "author": "Brainly Sp. z o.o. - (http://www.brainly.co)",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/guestlinelabs/nodejs-onesky-utils/issues"
-  },
-  "homepage": "https://github.com/guestlinelabs/nodejs-onesky-utils",
-  "dependencies": {
-    "md5": "^2.0.0",
-    "request": "^2.88.0",
-    "request-promise": "^4.2.2"
-  },
-  "devDependencies": {
-    "chai": "^4.2.0",
-    "eslint": "^5.12.0",
-    "mocha": "^7.2.0",
-    "mockery": "^2.1.0",
-    "sinon": "^7.2.2",
-    "sinon-chai": "^3.3.0"
-  }
+	"name": "@guestlinelabs/onesky-utils",
+	"version": "1.4.2",
+	"description": "Node.js utils for working with OneSky translation service.",
+	"main": "index.js",
+	"scripts": {
+		"lint": "biome ci lib",
+		"lint:apply": "biome check --write .",
+		"test": "mocha test"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/guestlinelabs/nodejs-onesky-utils.git"
+	},
+	"author": "Brainly Sp. z o.o. - (http://www.brainly.co)",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/guestlinelabs/nodejs-onesky-utils/issues"
+	},
+	"homepage": "https://github.com/guestlinelabs/nodejs-onesky-utils",
+	"dependencies": {
+		"md5": "^2.0.0"
+	},
+	"devDependencies": {
+		"@biomejs/biome": "1.8.2",
+		"chai": "^4.2.0",
+		"mocha": "^7.2.0",
+		"mockery": "^2.1.0",
+		"sinon": "^7.2.2",
+		"sinon-chai": "^3.3.0"
+	}
 }
