@@ -25,7 +25,6 @@
     "@biomejs/biome": "1.8.2",
     "chai": "^4.2.0",
     "mocha": "^7.2.0",
-    "mockery": "^2.1.0",
     "sinon": "^7.2.2",
     "sinon-chai": "^3.3.0"
   }
