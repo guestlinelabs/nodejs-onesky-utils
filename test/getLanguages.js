@@ -19,7 +19,7 @@ describe("GET languages list with wrong credentials", () => {
       try {
         await requestPromise;
         return {
-          json: () => requestPromise,
+          text: () => requestPromise,
         };
       } catch {
         let errValue;

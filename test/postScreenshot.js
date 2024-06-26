@@ -60,7 +60,7 @@ describe("POST screenshots", () => {
       try {
         await requestPromise;
         return {
-          json: () => requestPromise,
+          text: () => requestPromise,
         };
       } catch {
         let errValue;

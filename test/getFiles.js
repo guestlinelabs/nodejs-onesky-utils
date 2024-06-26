@@ -19,7 +19,7 @@ describe("GET files", () => {
       try {
         await requestPromise;
         return {
-          json: () => requestPromise,
+          text: () => requestPromise,
         };
       } catch {
         let errValue;

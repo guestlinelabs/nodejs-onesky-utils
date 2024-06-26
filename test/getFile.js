@@ -19,7 +19,7 @@ describe("GET translations with wrong credentials", () => {
       try {
         await requestPromise;
         return {
-          json: () => requestPromise,
+          text: () => requestPromise,
         };
       } catch {
         let errValue;
